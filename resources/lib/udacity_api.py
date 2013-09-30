@@ -2,6 +2,7 @@ import urllib2
 import json
 from BeautifulSoup import BeautifulSoup
 
+
 def get(url):
     """ Return the contents of the page as a string """
     req = urllib2.Request(url)
@@ -10,6 +11,7 @@ def get(url):
     response.close()
 
     return output.decode('ascii', 'ignore')
+
 
 def get_video_list(section):
     results = []
@@ -24,7 +26,6 @@ def get_video_list(section):
         model = data_obj['model']
         if model == 'Video':
             youtube_id = data_obj['_video']['youtube_id']
-            model 
             results.append(
                 (title, model, youtube_id, None))
         elif model == 'Exercise':
@@ -45,6 +46,7 @@ def get_video_list(section):
 
     return results
 
+
 def get_courses(level):
     output = []
     html = get("https://www.udacity.com/courses")
@@ -59,6 +61,7 @@ def get_courses(level):
         output.append((title, course_id, difficulty, 'http:' + thumbnail))
 
     return output
+
 
 def get_course_contents(course_id):
     output = []
@@ -81,6 +84,3 @@ def get_course_contents(course_id):
             (title, key, model))
 
     return output
-
-if __name__ == '__main__':
-    print get_lesson("cs212")
