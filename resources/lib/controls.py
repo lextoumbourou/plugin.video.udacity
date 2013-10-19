@@ -38,7 +38,11 @@ class FormQuiz(xbmcgui.Window):
                 x=x, y=y,
                 height=widget_height, width=widget_width, label='')
             self.addControl(widget_obj)
-        next_button = xbmcgui.ControlButton(x = self.width - 100, y = self.height + 5, width = 100, height = 50, label='Submit', font='font13', textColor='0xFFFFFFFF')
-        cancel_button = xbmcgui.ControlButton(x = self.width - 230, y = self.height + 5, width = 100, height = 50, label='Cancel', font='font13', textColor='0xFFFFFFFF')
-        self.addControl(next_button)
-        self.addControl(cancel_button)
+        self.next_button = xbmcgui.ControlButton(x = self.width - 100, y = self.height + 5, width = 100, height = 50, label='Submit', font='font13', textColor='0xFFFFFFFF')
+        self.cancel_button = xbmcgui.ControlButton(x = self.width - 230, y = self.height + 5, width = 100, height = 50, label='Cancel', font='font13', textColor='0xFFFFFFFF')
+        self.addControl(self.next_button)
+        self.addControl(self.cancel_button)
+
+    def onControl(self, control):
+        if control == self.cancel_button:
+            self.close()
