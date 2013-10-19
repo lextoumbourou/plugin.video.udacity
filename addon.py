@@ -1,6 +1,7 @@
-from xbmcswift2 import Plugin
+import json
+from xbmcswift2 import Plugin, xbmcgui
 
-from resources.lib import udacity_api as api
+from resources.lib import udacity_api as api, controls
 
 plugin = Plugin()
 
@@ -11,7 +12,7 @@ def index():
         {'label': 'Course Catalog',
          'path': plugin.url_for('course_catalog')},
         {'label': 'My Courses (not implemented yet)',
-         'path': plugin.url_for('my_courses')}
+         'path': plugin.url_for('my_courses')},
     ]
 
     return items
@@ -56,7 +57,7 @@ def open_lesson(lesson_key):
         elif model == 'Quiz':
             items.append({
                 'label': title,
-                'path': plugin.url_for('open_quiz', ref_id=''),
+                'path': plugin.url_for('open_quiz', quiz_data=json.dumps(quiz_data)),
             })
 
     return items
@@ -67,8 +68,14 @@ def my_courses():
     return []
 
 
-@plugin.route('/open_quiz/')
-def open_quiz():
+@plugin.route('/open_quiz/<quiz_data>')
+def open_quiz(quiz_data):
+    data = json.loads(quiz_data)
+    print data
+    new = controls.FormQuiz()
+    new.build(data)
+    new.doModal()
+    del new
     return []
 
 
