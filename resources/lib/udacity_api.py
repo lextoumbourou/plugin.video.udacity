@@ -1,6 +1,9 @@
 import urllib2
 import json
+import requests
 from BeautifulSoup import BeautifulSoup
+
+UDACITY_URL = "https://www.udacity.com"
 
 
 def get(url):
@@ -12,10 +15,17 @@ def get(url):
 
     return output.decode('ascii', 'ignore')
 
+def post(url, data):
+    """ Post JSON data and return contents of page as string """
+    req = urllib2.Request(url, data, {'Content-Type': 'application/json'})
+    f = urllib2.urlopen(req)
+    response = f.read()
+    f.close()
+    return response
 
 def get_video_list(section):
     results = []
-    url = "https://www.udacity.com/api/nodes/{0}".format(section)
+    url = "{0}/api/nodes/{1}".format(UDACITY_URL, section)
     url += "?depth=2&fresh=false&required_behavior=view&projection=classroom"
     output_json = get(url)
     data = json.loads(output_json[5:])['references']['Node']
@@ -49,7 +59,7 @@ def get_video_list(section):
 
 def get_courses(level):
     output = []
-    html = get("https://www.udacity.com/courses")
+    html = get("{0}/courses".format(UDACITY_URL))
     soup = BeautifulSoup(html)
     courses = soup.find('ul', id='unfiltered-class-list').findAll('li')
     for course in courses:
@@ -66,9 +76,9 @@ def get_courses(level):
 def get_course_contents(course_id):
     output = []
     url = (
-        "https://www.udacity.com/api/nodes/{0}"
+        "{0}/api/nodes/{1}"
         "?depth=1&fresh=false&required_behavior=view"
-        "&projection=navigation").format(course_id)
+        "&projection=navigation").format(UDACITY_URL, course_id)
     html = get(url)
     data = json.loads(html[5:])
     steps = data['references']['Node'][course_id]['steps_refs']
@@ -84,3 +94,28 @@ def get_course_contents(course_id):
             (title, key, model))
 
     return output
+
+def submit_quiz(quiz_id, widgets):
+    url = "{0}/api/nodes/{1}/evaluation?_method=GET".format(
+        UDACITY_URL, quiz_id) 
+    parts = []
+    for widget in widgets:
+        parts.append(
+            {"model": "SubmissionPart",
+             "marker": widget['data']['marker'],
+             "content": widget['obj'].isSelected()})
+
+    answer_data = {
+        "submission": {
+            "model": "Submission",
+            "operation": "GRADE",
+            "parts": parts
+        }
+    }
+    data = post(url, json.dumps(answer_data))
+    return json.loads(data[5:])
+
+if __name__ == '__main__':
+    quiz_data = {'key': 48719273}
+    print submit_quiz(quiz_data)
+

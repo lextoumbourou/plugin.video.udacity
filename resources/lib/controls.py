@@ -1,6 +1,7 @@
 from xbmcswift2 import xbmcgui
 import math
 import json
+import udacity_api as api
 
 # To do:
 # * Clean up "magic" values
@@ -17,6 +18,9 @@ WIDGET_MAPPING = {
 
 class FormQuiz(xbmcgui.Window):
     def build(self, data):
+        self.data = data
+        self.widgets = []
+
         self.width = int(self.getWidth() * 0.60)
         self.height = int(self.getHeight() * 0.60)
         offset_x = int((self.getWidth() * 0.65 - self.width) / 2)
@@ -34,15 +38,23 @@ class FormQuiz(xbmcgui.Window):
             widget_height = int(self.height * widget['placement']['height'])
             widget_width = int(self.width * widget['placement']['width'])
 
-            widget_obj = WIDGET_MAPPING[model](
+            obj = WIDGET_MAPPING[model](
                 x=x, y=y,
                 height=widget_height, width=widget_width, label='')
-            self.addControl(widget_obj)
-        self.next_button = xbmcgui.ControlButton(x = self.width - 100, y = self.height + 5, width = 100, height = 50, label='Submit', font='font13', textColor='0xFFFFFFFF')
+            self.addControl(obj)
+            self.widgets.append({
+                'obj': obj, 'data': widget})
+        self.submit_button = xbmcgui.ControlButton(x = self.width - 100, y = self.height + 5, width = 100, height = 50, label='Submit', font='font13', textColor='0xFFFFFFFF')
+        self.addControl(self.submit_button)
         self.cancel_button = xbmcgui.ControlButton(x = self.width - 230, y = self.height + 5, width = 100, height = 50, label='Cancel', font='font13', textColor='0xFFFFFFFF')
-        self.addControl(self.next_button)
         self.addControl(self.cancel_button)
 
     def onControl(self, control):
         if control == self.cancel_button:
             self.close()
+        elif control == self.submit_button:
+            result = api.submit_quiz(self.data['key'], self.widgets)
+            dialog = xbmcgui.Dialog()
+            dialog.ok('Result', result['evaluation']['comment'])
+            print result
+            
