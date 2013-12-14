@@ -4,7 +4,10 @@ import requests
 from BeautifulSoup import BeautifulSoup
 
 UDACITY_URL = "https://www.udacity.com"
-
+# Temporary measure. I'll stop faking the UA when I'm done testing - promise!
+HEADERS = {
+    'user-agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36'
+}
 
 def get(url):
     """ Return the contents of the page as a string """
@@ -39,7 +42,8 @@ def get_video_list(section):
             results.append(
                 (title, model, youtube_id, None))
         elif model == 'Exercise':
-            lecture_key = data_obj['lecture_ref']['key']
+            if data_obj['lecture_ref']:
+                lecture_key = data_obj['lecture_ref'].get('key')
             lecture_data = data[lecture_key]
             youtube_id = lecture_data['_video']['youtube_id']
             results.append(
@@ -48,7 +52,8 @@ def get_video_list(section):
             quiz_data = data[quiz_key]
             results.append(
                 (title + ' (Quiz)', 'Quiz', quiz_key, quiz_data))
-            answer_key = data_obj['answer_ref']['key']
+            if data_obj['answer_ref']:
+                answer_key = data_obj['answer_ref'].get('key')
             youtube_id = data[answer_key]['_video']['youtube_id']
             title = title + ' (Answer)'
             results.append(
@@ -115,7 +120,44 @@ def submit_quiz(quiz_id, widgets):
     data = post(url, json.dumps(answer_data))
     return json.loads(data[5:])
 
-if __name__ == '__main__':
-    quiz_data = {'key': 48719273}
-    print submit_quiz(quiz_data)
+class UdacityAuthentication(object):
+    def __init__(self):
+        self.is_authenticated = False
+        self.xsrf_token = None
+        self.cookies = None
 
+    def _get_xsrf_token(self):
+        r = requests.get('{0}/'.format(UDACITY_URL), headers=HEADERS)
+        self.xsrf_token = r.cookies['XSRF-TOKEN']
+
+    def authenticate(self, username, password):
+        if not self.xsrf_token:
+            self._get_xsrf_token()
+
+        url = '{0}/api/session'.format(
+            UDACITY_URL)
+        headers = dict(HEADERS.items() + {
+            'xsrf_token': self.xsrf_token,
+            'content-type': 'application/json;charset=UTF-8',
+        }.items())
+            
+        r = requests.post(url, data=json.dumps(
+            {'udacity': {'username': username, 'password': password}}),
+            headers=headers)
+        if r.status_code == 200:
+            self.is_authenticated = True
+            self.cookies = r.cookies
+            return True
+        else:
+            result = json.loads(r.text[5:])
+            self.error = result['error']
+            return False
+
+if __name__ == '__main__':
+    #quiz_data = {'key': 48719273}
+    #print submit_quiz(quiz_data)
+    udacity = UdacityAuthentication()
+    if udacity.authenticate(username='lextoumbourou@gmail.com', password='Due4Expiry'):
+        print udacity.cookies
+    else:
+        print 'Failed', udacity.error
