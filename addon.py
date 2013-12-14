@@ -1,26 +1,31 @@
 import json
 from xbmcswift2 import Plugin, xbmcgui
 
-from resources.lib import udacity_api as api, controls
+from resources.lib.udacity import Udacity, UdacityAuth
 
 plugin = Plugin()
 
 
 @plugin.route('/')
 def index():
-    items = [
-        {'label': 'Course Catalog',
-         'path': plugin.url_for('course_catalog')},
-        {'label': 'My Courses (not implemented yet)',
+    items = [{'label': 'Course Catalog',
+             'path': plugin.url_for('course_catalog')},]
+    items.append(
+        {'label': 'My Courses',
          'path': plugin.url_for('my_courses')},
-    ]
+    )
+    items.append(
+        {'label': 'Change plugin settings',
+         'path': plugin.url_for('open_settings')},
+    )
 
     return items
 
 
 @plugin.route('/course_catalog/')
 def course_catalog():
-    courses = api.get_courses(None)
+    udacity = Udacity(None)
+    courses = udacity.get_courses(None)
     items = [{
         'label': title,
         'path': plugin.url_for('open_course', course_id=course_id),
@@ -33,7 +38,8 @@ def course_catalog():
 @plugin.route('/course/<course_id>')
 def open_course(course_id):
     items = []
-    contents = api.get_course_contents(course_id)
+    udacity = Udacity(None)
+    contents = udacity.get_course_contents(course_id)
     for title, key, model in contents:
         items.append({
             'label': title,
@@ -46,7 +52,8 @@ def open_course(course_id):
 @plugin.route('/open_lesson/<lesson_key>')
 def open_lesson(lesson_key):
     items = []
-    videos = api.get_video_list(lesson_key)
+    udacity = Udacity(None)
+    videos = udacity.get_video_list(lesson_key)
     for title, model, youtube_id, quiz_data in videos:
         if model == 'Video':
             items.append({
@@ -65,13 +72,32 @@ def open_lesson(lesson_key):
 
 @plugin.route('/my_courses/')
 def my_courses():
-    return []
+    items = []
+    auth = UdacityAuth()
+    username = plugin.get_setting('username')
+    password = plugin.get_setting('user_password')
+    if auth.authenticate(username, password):
+        udacity = Udacity(auth)
+        courses = udacity.get_my_courses()
+        for title, course_id in courses:
+            items.append({
+                'label': title,
+                'path': plugin.url_for('open_course', course_id=course_id),
+            })
+
+        return items
+    else:
+        return plugin.notify(auth.error)
+
+
+@plugin.route('/open_settings/')
+def open_settings():
+    return plugin.open_settings()
 
 
 @plugin.route('/open_quiz/<quiz_data>')
 def open_quiz(quiz_data):
     data = json.loads(quiz_data)
-    print data
     new = controls.FormQuiz()
     new.build(data)
     new.doModal()
@@ -84,7 +110,7 @@ def play_lecture(lec_id):
     youtube_url = (
         "plugin://plugin.video.youtube/"
         "?action=play_video&videoid={0}").format(lec_id)
-    plugin.set_resolved_url(youtube_url)
+    return plugin.set_resolved_url(youtube_url)
 
 if __name__ == '__main__':
     plugin.run()
