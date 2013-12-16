@@ -113,7 +113,6 @@ def open_quiz(course_id, lesson_key, group_id, asset_id, quiz_data):
     new.build(course_id, lesson_key, group_id, asset_id, data, udacity)
     new.doModal()
     del new
-    return []
 
 
 @plugin.route('/lectures/<lec_id>')
