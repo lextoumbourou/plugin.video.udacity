@@ -1,5 +1,5 @@
 import json
-from xbmcswift2 import Plugin, xbmcgui
+from xbmcswift2 import Plugin
 
 from resources.lib.udacity import Udacity, UdacityAuth
 from resources.lib import controls
@@ -10,7 +10,7 @@ plugin = Plugin()
 @plugin.route('/')
 def index():
     items = [{'label': 'Course Catalog',
-             'path': plugin.url_for('course_catalog')},]
+             'path': plugin.url_for('course_catalog')}]
     items.append(
         {'label': 'My Courses',
          'path': plugin.url_for('my_courses')},
@@ -44,7 +44,8 @@ def open_course(course_id):
     for title, key, model in contents:
         items.append({
             'label': title,
-            'path': plugin.url_for('open_lesson', course_id=course_id, lesson_key=key)
+            'path': plugin.url_for(
+                'open_lesson', course_id=course_id, lesson_key=key)
         })
 
     return items
@@ -100,7 +101,8 @@ def open_settings():
     return plugin.open_settings()
 
 
-@plugin.route('/open_quiz/<course_id>/<lesson_key>/<group_id>/<asset_id>/<quiz_data>')
+@plugin.route(
+    '/open_quiz/<course_id>/<lesson_key>/<group_id>/<asset_id>/<quiz_data>')
 def open_quiz(course_id, lesson_key, group_id, asset_id, quiz_data):
     auth = UdacityAuth(plugin.get_storage('auth'))
     auth.authenticate(

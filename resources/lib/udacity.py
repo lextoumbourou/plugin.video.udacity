@@ -6,8 +6,11 @@ from BeautifulSoup import BeautifulSoup
 
 UDACITY_URL = "https://www.udacity.com"
 # Temporary measure. I'll stop faking the UA when I'm done testing - promise!
-USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36"
-HEADERS = {'user-agent':USER_AGENT}
+USER_AGENT = (
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36")
+HEADERS = {'user-agent': USER_AGENT}
+
 
 class Udacity(object):
     def __init__(self, auth):
@@ -17,17 +20,18 @@ class Udacity(object):
             self, course_id, lesson_id, group_id, asset_id, activity_type):
         occurence_time = dt.datetime.utcnow().isoformat()
 
-        data = {
-            'items':[
-                {'occurrence_time':occurence_time,'content_context':[
-                    {'tag':'c-','node_key':course_id},
-                    {'tag':'l-','node_key':lesson_id},
-                    {'tag':"e-","node_key":group_id},
-                    {'tag':"m-","node_key":asset_id}],
-                    'data':{'model':activity_type}}],'current_time':occurence_time
-                }
-        r = requests.post('{0}/api/activity'.format(UDACITY_URL),
-                data=json.dumps(data), headers=self.auth.get_request_headers())
+        data = {'items': [
+            {'occurrence_time': occurence_time, 'content_context': [
+                {'tag': 'c-', 'node_key': course_id},
+                {'tag': 'l-', 'node_key': lesson_id},
+                {'tag': "e-", "node_key": group_id},
+                {'tag': "m-", "node_key": asset_id}],
+                'data': {'model': activity_type}}],
+            'current_time': occurence_time}
+
+        r = requests.post(
+            '{0}/api/activity'.format(UDACITY_URL),
+            data=json.dumps(data), headers=self.auth.get_request_headers())
         print r.status_code
 
     def get_my_courses(self):
@@ -40,12 +44,15 @@ class Udacity(object):
             data = json.loads(r.text[5:])
             enrollments = data['user']['_enrollments']
             current = [e for e in enrollments if e['state'] == 'enrolled']
-            send_data = json.dumps({'keys':
-                    [e['node_key'] for e in current], 'fresh': False, 'depth': 0})
+            send_data = json.dumps(
+                {'keys':
+                    [e['node_key'] for e in current],
+                    'fresh': False, 'depth': 0})
             course_req = requests.get(
-                    '{0}/api/nodes'.format(UDACITY_URL), params={'json':send_data},
-                    headers=self.auth.get_request_headers(),
-                    cookies=self.auth.get_cookies())
+                '{0}/api/nodes'.format(UDACITY_URL),
+                params={'json': send_data},
+                headers=self.auth.get_request_headers(),
+                cookies=self.auth.get_cookies())
             course_data = json.loads(course_req.text[5:])
             courses = course_data['references']['Node']
             for key in courses.keys():
@@ -59,7 +66,8 @@ class Udacity(object):
     def get_video_list(self, section):
         results = []
         url = "{0}/api/nodes/{1}".format(UDACITY_URL, section)
-        url += "?depth=2&fresh=false&required_behavior=view&projection=classroom"
+        url += (
+            "?depth=2&fresh=false&required_behavior=view&projection=classroom")
         r = requests.get(url)
         data = json.loads(r.text[5:])['references']['Node']
         steps = data[section]['steps_refs']
@@ -83,7 +91,8 @@ class Udacity(object):
                 quiz_key = data_obj['quiz_ref']['key']
                 quiz_data = data[quiz_key]
                 results.append(
-                    (title + ' (Quiz)', 'Quiz', None, group_id, quiz_key, quiz_data))
+                    (title + ' (Quiz)', 'Quiz', None,
+                        group_id, quiz_key, quiz_data))
                 if data_obj['answer_ref']:
                     answer_key = data_obj['answer_ref'].get('key')
                 youtube_id = data[answer_key]['_video']['youtube_id']
@@ -100,7 +109,8 @@ class Udacity(object):
         courses = soup.find('ul', id='unfiltered-class-list').findAll('li')
         for course in courses:
             title = course.find('span', 'crs-li-title').text
-            thumbnail = course.find('span', 'crs-li-thumbnails').find('img')['src']
+            thumbnail = course.find(
+                'span', 'crs-li-thumbnails').find('img')['src']
             difficulty = course.find('span', 'level-widget')['title']
             url = course.find('a')['href']
             course_id = url.split('/')[-1]
@@ -132,7 +142,7 @@ class Udacity(object):
 
     def submit_quiz(self, quiz_id, widgets):
         url = "{0}/api/nodes/{1}/evaluation?_method=GET".format(
-            UDACITY_URL, quiz_id) 
+            UDACITY_URL, quiz_id)
         parts = []
         for widget in widgets:
             parts.append(
@@ -147,8 +157,11 @@ class Udacity(object):
                 "parts": parts
             }
         }
-        r = requests.post(url, data=json.dumps(answer_data), headers=self.auth.get_request_headers())
+        r = requests.post(
+            url, data=json.dumps(answer_data),
+            headers=self.auth.get_request_headers())
         return json.loads(r.text[5:])
+
 
 class UdacityAuth(object):
     def __init__(self, auth_stored):
@@ -175,7 +188,7 @@ class UdacityAuth(object):
             self.error = 'Username and password required'
             return False
 
-        if (self.auth_stored.get('cookies') and 
+        if (self.auth_stored.get('cookies') and
                 self.auth_stored.get('xsrf_token')):
             self.is_authenticated = True
             return True
@@ -186,7 +199,7 @@ class UdacityAuth(object):
 
         url = '{0}/api/session'.format(
             UDACITY_URL)
-                    
+
         r = requests.post(url, data=json.dumps(
             {'udacity': {'username': username, 'password': password}}),
             headers=self.get_request_headers())

@@ -1,22 +1,16 @@
 from xbmcswift2 import xbmcgui
 import math
 import os
-import json
-import udacity as Udacity
 
-MEDIA_DIR = os.path.dirname(os.path.dirname(__file__)) + os.sep + "media" + os.sep
-
-# To do:
-# * Clean up "magic" values
-# * Get cancel button to work
-# * Get Submit to work
+MEDIA_DIR = os.path.dirname(
+    os.path.dirname(__file__)) + os.sep + "media" + os.sep
 
 WIDGET_MAPPING = {
     'TextInputWidget': xbmcgui.ControlTextBox,
-     'NumericInputWidget': xbmcgui.ControlTextBox,
-     'RadioButtonWidget': xbmcgui.ControlRadioButton,
-     'CheckboxWidget': xbmcgui.ControlRadioButton,
- }
+    'NumericInputWidget': xbmcgui.ControlTextBox,
+    'RadioButtonWidget': xbmcgui.ControlRadioButton,
+    'CheckboxWidget': xbmcgui.ControlRadioButton,
+}
 
 OFFSET_X_MULTIPLIER = 0.65
 OFFSET_Y_MULTIPLIER = 0.65
@@ -43,7 +37,7 @@ class FormQuiz(xbmcgui.WindowDialog):
             course_id, lesson_id, group_id, asset_id, 'NodeVisit')
         bg_image_path = MEDIA_DIR + "blank.png"
         self.addControl(xbmcgui.ControlImage(
-            0,0, self.width, 720, bg_image_path)
+            0, 0, self.width, 720, bg_image_path)
         )
         if '_background_image' in data:
             url = 'http:' + data['_background_image']['serving_url']
@@ -57,8 +51,9 @@ class FormQuiz(xbmcgui.WindowDialog):
             x = int(math.ceil(
                 widget['placement']['x'] * self.width) - self.widget_x_offset)
             y = int(math.ceil(
-                widget['placement']['y'] * 
-                (self.height - self.widget_y_multiplier_offset)) - self.widget_y_offset)
+                widget['placement']['y'] *
+                (self.height - self.widget_y_multiplier_offset)) -
+                self.widget_y_offset)
             widget_height = int(self.height * widget['placement']['height'])
             widget_width = int(self.width * widget['placement']['width'])
 
@@ -70,12 +65,12 @@ class FormQuiz(xbmcgui.WindowDialog):
                 'obj': obj, 'data': widget})
 
         self.submit_button = xbmcgui.ControlButton(
-            x = 1100, y = 660, width = self.button_width,
-            height = self.button_height, shadowColor='0xFF000000',
+            x=1100, y=660, width=self.button_width,
+            height=self.button_height, shadowColor='0xFF000000',
             label='Submit', font='font13', textColor=self.button_text_colour)
         self.cancel_button = xbmcgui.ControlButton(
-            x = 970, y = 660, width = self.button_width,
-            height = self.button_height, label='Cancel',
+            x=970, y=660, width=self.button_width,
+            height=self.button_height, label='Cancel',
             font='font13', textColor=self.button_text_colour)
 
         self.addControl(self.submit_button)
@@ -90,4 +85,3 @@ class FormQuiz(xbmcgui.WindowDialog):
             dialog = xbmcgui.Dialog()
             dialog.ok('Result', result['evaluation']['comment'])
             print result
-            
