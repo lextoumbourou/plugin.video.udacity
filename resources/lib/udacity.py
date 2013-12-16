@@ -19,7 +19,7 @@ class Udacity(object):
             r = requests.get(
                 '{0}/api/users/me'.format(UDACITY_URL),
                 headers=self.auth.get_request_headers(),
-                cookies=self.auth.cookies)
+                cookies=self.auth.get_cookies())
             data = json.loads(r.text[5:])
             enrollments = data['user']['_enrollments']
             current = [e for e in enrollments if e['state'] == 'enrolled']
@@ -28,7 +28,7 @@ class Udacity(object):
             course_req = requests.get(
                     '{0}/api/nodes'.format(UDACITY_URL), params={'json':send_data},
                     headers=self.auth.get_request_headers(),
-                    cookies=self.auth.cookies)
+                    cookies=self.auth.get_cookies())
             course_data = json.loads(course_req.text[5:])
             courses = course_data['references']['Node']
             for key in courses.keys():
@@ -132,18 +132,38 @@ class Udacity(object):
         return json.loads(data[5:])
 
 class UdacityAuth(object):
-    def __init__(self):
+    def __init__(self, auth_stored):
+        """
+        params:
+            auth_stored - persistant storage object from get_storage() function
+        """
         self.is_authenticated = False
-        self.xsrf_token = None
-        self.cookies = None
+        self.auth_stored = auth_stored
 
-    def _get_xsrf_token(self):
-        r = requests.get('{0}/'.format(UDACITY_URL), headers=HEADERS)
-        self.xsrf_token = r.cookies['XSRF-TOKEN']
+    def get_xsrf_token(self, force=False):
+        if not self.auth_stored.get('xsrf_token') or force:
+            r = requests.get('{0}/'.format(UDACITY_URL), headers=HEADERS)
+            if r.status_code == 200:
+                self.auth_stored['xsrf_token'] = r.cookies['XSRF-TOKEN']
+
+        return self.auth_stored.get('xsrf_token')
+
+    def get_cookies(self):
+        return self.auth_stored.get('cookies')
 
     def authenticate(self, username, password):
-        if not self.xsrf_token:
-            self._get_xsrf_token()
+        if not username or not password:
+            self.error = 'Username and password required'
+            return False
+
+        if (self.auth_stored.get('cookies') and 
+                self.auth_stored.get('xsrf_token')):
+            self.is_authenticated = True
+            return True
+
+        if not self.get_xsrf_token(force=True):
+            self.error = "Can't obtain xsrf token"
+            return False
 
         url = '{0}/api/session'.format(
             UDACITY_URL)
@@ -153,7 +173,7 @@ class UdacityAuth(object):
             headers=self.get_request_headers())
         if r.status_code == 200:
             self.is_authenticated = True
-            self.cookies = r.cookies
+            self.auth_stored['cookies'] = r.cookies
             return True
         else:
             result = json.loads(r.text[5:])
@@ -162,6 +182,6 @@ class UdacityAuth(object):
 
     def get_request_headers(self):
         return dict(HEADERS.items() + {
-            'xsrf_token': self.xsrf_token,
+            'xsrf_token': self.get_xsrf_token(),
             'content-type': 'application/json;charset=UTF-8',
         }.items())

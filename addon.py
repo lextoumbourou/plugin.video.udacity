@@ -70,10 +70,11 @@ def open_lesson(lesson_key):
     return items
 
 
-@plugin.route('/my_courses/')
+@plugin.cached_route('/my_courses/')
 def my_courses():
     items = []
-    auth = UdacityAuth()
+    auth_storage = plugin.get_storage('auth')
+    auth = UdacityAuth(auth_storage)
     username = plugin.get_setting('username')
     password = plugin.get_setting('user_password')
     if auth.authenticate(username, password):
