@@ -2,6 +2,7 @@ import json
 from xbmcswift2 import Plugin, xbmcgui
 
 from resources.lib.udacity import Udacity, UdacityAuth
+from resources.lib import controls
 
 plugin = Plugin()
 
@@ -43,18 +44,18 @@ def open_course(course_id):
     for title, key, model in contents:
         items.append({
             'label': title,
-            'path': plugin.url_for('open_lesson', lesson_key=key)
+            'path': plugin.url_for('open_lesson', course_id=course_id, lesson_key=key)
         })
 
     return items
 
 
-@plugin.route('/open_lesson/<lesson_key>')
-def open_lesson(lesson_key):
+@plugin.route('/open_lesson/<course_id>/<lesson_key>')
+def open_lesson(course_id, lesson_key):
     items = []
     udacity = Udacity(None)
     videos = udacity.get_video_list(lesson_key)
-    for title, model, youtube_id, quiz_data in videos:
+    for title, model, youtube_id, group_id, asset_id, quiz_data in videos:
         if model == 'Video':
             items.append({
                 'label': title,
@@ -64,7 +65,10 @@ def open_lesson(lesson_key):
         elif model == 'Quiz':
             items.append({
                 'label': title,
-                'path': plugin.url_for('open_quiz', quiz_data=json.dumps(quiz_data)),
+                'path': plugin.url_for(
+                    'open_quiz', course_id=course_id, lesson_key=lesson_key,
+                    group_id=group_id, asset_id=asset_id,
+                    quiz_data=json.dumps(quiz_data)),
             })
 
     return items
@@ -96,11 +100,17 @@ def open_settings():
     return plugin.open_settings()
 
 
-@plugin.route('/open_quiz/<quiz_data>')
-def open_quiz(quiz_data):
+@plugin.route('/open_quiz/<course_id>/<lesson_key>/<group_id>/<asset_id>/<quiz_data>')
+def open_quiz(course_id, lesson_key, group_id, asset_id, quiz_data):
+    auth = UdacityAuth(plugin.get_storage('auth'))
+    auth.authenticate(
+        plugin.get_setting('username'),
+        plugin.get_setting('user_password'))
+    udacity = Udacity(auth)
     data = json.loads(quiz_data)
+    print data
     new = controls.FormQuiz()
-    new.build(data)
+    new.build(course_id, lesson_key, group_id, asset_id, data, udacity)
     new.doModal()
     del new
     return []

@@ -25,10 +25,12 @@ BUTTON_TEXT_COLOUR = '0xFFFFFFFF'
 
 
 class FormQuiz(xbmcgui.Window):
-    def build(self, data, udacity):
+    def build(self, course_id, lesson_id, group_id, asset_id, data, udacity):
         self.udacity = udacity
         self.data = data
         self.widgets = []
+        self.udacity.update_activity(
+            course_id, lesson_id, group_id, asset_id, 'NodeVisit')
 
         self.width = int(self.getWidth() * 0.60)
         self.height = int(self.getHeight() * 0.60)
