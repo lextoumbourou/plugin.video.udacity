@@ -147,8 +147,8 @@ class Udacity(object):
                 "parts": parts
             }
         }
-        data = post(url, json.dumps(answer_data))
-        return json.loads(data[5:])
+        r = requests.post(url, data=json.dumps(answer_data), headers=self.auth.get_request_headers())
+        return json.loads(r.text[5:])
 
 class UdacityAuth(object):
     def __init__(self, auth_stored):
