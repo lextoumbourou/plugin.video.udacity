@@ -29,23 +29,24 @@ class FormQuiz(xbmcgui.WindowDialog):
         self.button_height = 50
         self.button_text_colour = '0xFFFFFFFF'
 
-    def build(self, course_id, lesson_id, group_id, asset_id, data, udacity):
+    def build(self, course_id, lesson_id, group_id, quiz_id, quiz_data, udacity):
         self.udacity = udacity
-        self.data = data
+        self.data = quiz_data['data']
+        print self.data
         self.widgets = []
         self.udacity.update_activity(
-            course_id, lesson_id, group_id, asset_id, 'NodeVisit')
+            course_id, lesson_id, group_id, quiz_id, 'NodeVisit')
         bg_image_path = MEDIA_DIR + "blank.png"
         self.addControl(xbmcgui.ControlImage(
             0, 0, self.width, 720, bg_image_path)
         )
-        if '_background_image' in data:
-            url = 'http:' + data['_background_image']['serving_url']
+        if '_background_image' in self.data:
+            url = 'http:' + self.data['_background_image']['serving_url']
             self.addControl(xbmcgui.ControlImage(
                 x=0, y=0, width=self.width,
                 height=self.height - self.bottom_height, filename=url))
 
-        widgets = data['widgets']
+        widgets = self.data['widgets']
         for widget in widgets:
             model = widget['model']
             x = int(math.ceil(
@@ -84,4 +85,5 @@ class FormQuiz(xbmcgui.WindowDialog):
             result = self.udacity.submit_quiz(self.data['key'], self.widgets)
             dialog = xbmcgui.Dialog()
             dialog.ok('Result', result['evaluation']['comment'])
-            print result
+            self.close()
+            return

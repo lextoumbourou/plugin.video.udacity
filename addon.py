@@ -1,5 +1,5 @@
 import json
-from xbmcswift2 import Plugin
+from xbmcswift2 import Plugin, xbmcplugin
 
 from resources.lib.udacity import Udacity, UdacityAuth
 from resources.lib import controls
@@ -17,7 +17,7 @@ def index():
     )
     items.append(
         {'label': 'Change plugin settings',
-         'path': plugin.url_for('open_settings')},
+         'path': plugin.url_for('open_settings')}
     )
 
     return items
@@ -45,31 +45,37 @@ def open_course(course_id):
         items.append({
             'label': title,
             'path': plugin.url_for(
-                'open_lesson', course_id=course_id, lesson_key=key)
+                'open_lesson', course_id=course_id, lesson_id=key)
         })
 
     return items
 
 
-@plugin.route('/open_lesson/<course_id>/<lesson_key>')
-def open_lesson(course_id, lesson_key):
+@plugin.route('/open_lesson/<course_id>/<lesson_id>')
+def open_lesson(course_id, lesson_id):
     items = []
     udacity = Udacity(None)
-    videos = udacity.get_video_list(lesson_key)
-    for title, model, youtube_id, group_id, asset_id, quiz_data in videos:
-        if model == 'Video':
+    contents = udacity.get_lesson_contents(lesson_id)
+    for content in contents:
+        print content
+        if content['model'] == 'Video':
             items.append({
-                'label': title,
-                'path': plugin.url_for('play_lecture', lec_id=youtube_id),
+                'label': content.get('title'),
+                'path': plugin.url_for('play_video',
+                    course_id=course_id, lesson_id=lesson_id,
+                    asset_id=content.get('key'),
+                    youtube_id=content['_video'].get('youtube_id')),
                 'is_playable': True,
             })
-        elif model == 'Quiz':
+        elif content['model'] == 'Exercise':
             items.append({
-                'label': title,
-                'path': plugin.url_for(
-                    'open_quiz', course_id=course_id, lesson_key=lesson_key,
-                    group_id=group_id, asset_id=asset_id,
-                    quiz_data=json.dumps(quiz_data)),
+                'label': content.get('title'),
+                'path': plugin.url_for('play_exercise',
+                    course_id=course_id, lesson_id=lesson_id,
+                    group_id=content.get('key'),
+                    lecture=json.dumps(content.get('lecture_ref')),
+                    quiz=json.dumps(content.get('quiz_ref')),
+                    answer=json.dumps(content.get('answer_ref'))),
             })
 
     return items
@@ -101,27 +107,62 @@ def open_settings():
     return plugin.open_settings()
 
 
-@plugin.route(
-    '/open_quiz/<course_id>/<lesson_key>/<group_id>/<asset_id>/<quiz_data>')
-def open_quiz(course_id, lesson_key, group_id, asset_id, quiz_data):
+@plugin.route((
+    '/play_exercise/<course_id>/<lesson_id>/<group_id>'
+    '/<lecture>/<quiz>/<answer>'))
+def play_exercise(
+    course_id, lesson_id, group_id, lecture, quiz, answer):
+    lecture_data = json.loads(lecture)
+    quiz_data = json.loads(quiz)
+    answer_data = json.loads(answer)
+    print answer_data
+    items = []
+    if lecture_data:
+        items.append({
+            'label': 'Lecture',
+            'path': plugin.url_for('play_video',
+                course_id=course_id, lesson_id=lesson_id,
+                asset_id=lecture_data.get('key'),
+                youtube_id=lecture_data['data']['_video'].get('youtube_id')),
+            'is_playable': True
+        })
+    if quiz_data:
+        items.append({
+            'label': 'Quiz',
+            'path': plugin.url_for('load_quiz',
+                course_id=course_id, lesson_id=lesson_id,
+                group_id=group_id, quiz=quiz),
+        })
+    if answer_data:
+        items.append({
+            'label': 'Answer',
+            'path': plugin.url_for('play_video',
+                course_id=course_id, lesson_id=lesson_id,
+                asset_id=answer_data.get('key'),
+                youtube_id=answer_data['data']['_video'].get('youtube_id')),
+            'is_playable': True
+        })
+
+    return items
+
+@plugin.route('/load_quiz/<course_id>/<lesson_id>/<group_id>/<quiz>')
+def load_quiz(course_id, lesson_id, group_id, quiz):
+    quiz_data = json.loads(quiz)
     auth = UdacityAuth(plugin.get_storage('auth'))
     auth.authenticate(
         plugin.get_setting('username'),
         plugin.get_setting('user_password'))
     udacity = Udacity(auth)
-    data = json.loads(quiz_data)
-    print data
     new = controls.FormQuiz()
-    new.build(course_id, lesson_key, group_id, asset_id, data, udacity)
+    new.build(course_id, lesson_id, group_id, quiz_data['key'], quiz_data, udacity)
     new.doModal()
     del new
 
-
-@plugin.route('/lectures/<lec_id>')
-def play_lecture(lec_id):
+@plugin.route('/lectures/<course_id>/<lesson_id>/<asset_id>/<youtube_id>')
+def play_video(course_id, lesson_id, asset_id, youtube_id):
     youtube_url = (
         "plugin://plugin.video.youtube/"
-        "?action=play_video&videoid={0}").format(lec_id)
+        "?action=play_video&videoid={0}").format(youtube_id)
     return plugin.set_resolved_url(youtube_url)
 
 if __name__ == '__main__':

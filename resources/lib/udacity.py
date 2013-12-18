@@ -63,7 +63,7 @@ class Udacity(object):
         else:
             return None
 
-    def get_video_list(self, section):
+    def get_lesson_contents(self, section):
         results = []
         url = "{0}/api/nodes/{1}".format(UDACITY_URL, section)
         url += (
@@ -72,33 +72,22 @@ class Udacity(object):
         data = json.loads(r.text[5:])['references']['Node']
         steps = data[section]['steps_refs']
         for step in steps:
-            group_id = step['key']
-            data_obj = data[step['key']]
-            asset_id = data_obj['key']
-            title = data_obj['title']
-            model = data_obj['model']
-            if model == 'Video':
-                youtube_id = data_obj['_video']['youtube_id']
-                results.append(
-                    (title, model, youtube_id, group_id, asset_id, None))
-            elif model == 'Exercise':
-                if data_obj['lecture_ref']:
-                    lecture_key = data_obj['lecture_ref'].get('key')
-                lecture_data = data[lecture_key]
-                youtube_id = lecture_data['_video']['youtube_id']
-                results.append(
-                    (title, 'Video', youtube_id, group_id, asset_id, None))
-                quiz_key = data_obj['quiz_ref']['key']
-                quiz_data = data[quiz_key]
-                results.append(
-                    (title + ' (Quiz)', 'Quiz', None,
-                        group_id, quiz_key, quiz_data))
-                if data_obj['answer_ref']:
-                    answer_key = data_obj['answer_ref'].get('key')
-                youtube_id = data[answer_key]['_video']['youtube_id']
-                title = title + ' (Answer)'
-                results.append(
-                    (title, 'Video', youtube_id, group_id, asset_id, None))
+            node = data[step['key']]
+
+            # Push the quiz and lecture data into the dictionary
+            # to support XBMC's stateless nature
+            if node['model'] == 'Exercise':
+                if node['lecture_ref']:
+                    lecture_key = node['lecture_ref'].get('key')
+                    node['lecture_ref']['data'] = data[lecture_key]
+                if node['quiz_ref']:
+                    quiz_key = node['quiz_ref']['key']
+                    node['quiz_ref']['data'] = data[quiz_key]
+                if node['answer_ref']:
+                    answer_key = node['answer_ref']['key']
+                    node['answer_ref']['data'] = data[answer_key]
+
+            results.append(node)
 
         return results
 
@@ -217,3 +206,7 @@ class UdacityAuth(object):
             'xsrf_token': self.get_xsrf_token(),
             'content-type': 'application/json;charset=UTF-8',
         }.items())
+
+if __name__ == '__main__':
+    ud = Udacity(None)
+    print ud.get_lesson_contents('308873795')
