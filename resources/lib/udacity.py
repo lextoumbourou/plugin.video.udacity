@@ -137,7 +137,7 @@ class Udacity(object):
             parts.append(
                 {"model": "SubmissionPart",
                  "marker": widget['data']['marker'],
-                 "content": widget['obj'].isSelected()})
+                 "content": widget['obj'].getContent()})
 
         answer_data = {
             "submission": {

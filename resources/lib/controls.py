@@ -1,19 +1,37 @@
-from xbmcswift2 import xbmcgui
+from xbmcswift2 import xbmcgui, xbmc
 import math
 import os
 
 MEDIA_DIR = os.path.dirname(
     os.path.dirname(__file__)) + os.sep + "media" + os.sep
 
-WIDGET_MAPPING = {
-    'TextInputWidget': xbmcgui.ControlTextBox,
-    'NumericInputWidget': xbmcgui.ControlTextBox,
-    'RadioButtonWidget': xbmcgui.ControlRadioButton,
-    'CheckboxWidget': xbmcgui.ControlRadioButton,
-}
-
 OFFSET_X_MULTIPLIER = 0.65
 OFFSET_Y_MULTIPLIER = 0.65
+
+
+class TextBox(xbmcgui.ControlButton):
+    def getContent(self):
+        return self.getLabel()
+
+    def updateLabel(self):
+        label = self.getLabel()
+        keyboard = xbmc.Keyboard(label)
+        keyboard.doModal()
+        self.setLabel(
+            keyboard.getText())
+
+    @property
+    def canUpdateLabel(self):
+        return True
+
+
+class RadioButton(xbmcgui.ControlRadioButton):
+    def getContent(self):
+        return self.isSelected()
+
+    @property
+    def canUpdateLabel(self):
+        return False
 
 
 class FormQuiz(xbmcgui.WindowDialog):
@@ -27,6 +45,8 @@ class FormQuiz(xbmcgui.WindowDialog):
         self.widget_y_multiplier_offset = 70
         self.button_width = 100
         self.button_height = 50
+        self.text_box_width = 100
+        self.text_box_height = 50
         self.button_text_colour = '0xFFFFFFFF'
 
     def build(
@@ -59,9 +79,17 @@ class FormQuiz(xbmcgui.WindowDialog):
             widget_height = int(self.height * widget['placement']['height'])
             widget_width = int(self.width * widget['placement']['width'])
 
-            obj = WIDGET_MAPPING[model](
-                x=x, y=y,
-                height=widget_height, width=widget_width,  label='')
+            if model == 'TextInputWidget' or model == 'NumericInputWidget':
+                # Not sure why, but needs to be adjusted slightly
+                x = x + 20
+                obj = TextBox(
+                    x=x, y=y, height=widget_height, width=widget_width,
+                    label='', textColor="0xFF000000", shadowColor='0xFF000000')
+            else:
+                obj = RadioButton(
+                    x=x, y=y,
+                    height=widget_height, width=widget_width,  label='')
+
             self.addControl(obj)
             self.widgets.append({
                 'obj': obj, 'data': widget})
@@ -70,21 +98,23 @@ class FormQuiz(xbmcgui.WindowDialog):
             x=1100, y=660, width=self.button_width,
             height=self.button_height, shadowColor='0xFF000000',
             label='Submit', font='font13', textColor=self.button_text_colour)
-        self.cancel_button = xbmcgui.ControlButton(
+        self.back_button = xbmcgui.ControlButton(
             x=970, y=660, width=self.button_width,
-            height=self.button_height, label='Cancel',
+            height=self.button_height, label='Back',
             font='font13', textColor=self.button_text_colour)
 
         self.addControl(self.submit_button)
-        self.addControl(self.cancel_button)
+        self.addControl(self.back_button)
 
     def onControl(self, control):
-        if control == self.cancel_button:
+        if control == self.back_button:
             self.close()
             return
         elif control == self.submit_button:
             result = self.udacity.submit_quiz(self.data['key'], self.widgets)
             dialog = xbmcgui.Dialog()
             dialog.ok('Result', result['evaluation']['comment'])
-            self.close()
-            return
+        else:
+            for count, widget in enumerate(self.widgets):
+                if widget['obj'].canUpdateLabel:
+                    self.widgets[count]['obj'].updateLabel()
