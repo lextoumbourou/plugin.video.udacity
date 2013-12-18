@@ -10,5 +10,5 @@ Pre alpha
 ## To do
 
 * Make video watched when user watches it online
-* Support other types of quiz
 * Load user-saved data into quizzes
+* Handle large text fields like code blocks (probably just display a message pointing to online content)
