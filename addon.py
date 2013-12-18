@@ -1,5 +1,5 @@
 import json
-from xbmcswift2 import Plugin, xbmcplugin
+from xbmcswift2 import Plugin
 
 from resources.lib.udacity import Udacity, UdacityAuth
 from resources.lib import controls
@@ -57,12 +57,11 @@ def open_lesson(course_id, lesson_id):
     udacity = Udacity(None)
     contents = udacity.get_lesson_contents(lesson_id)
     for content in contents:
-        print content
         if content['model'] == 'Video':
             items.append({
                 'label': content.get('title'),
-                'path': plugin.url_for('play_video',
-                    course_id=course_id, lesson_id=lesson_id,
+                'path': plugin.url_for(
+                    'play_video', course_id=course_id, lesson_id=lesson_id,
                     asset_id=content.get('key'),
                     youtube_id=content['_video'].get('youtube_id')),
                 'is_playable': True,
@@ -70,9 +69,9 @@ def open_lesson(course_id, lesson_id):
         elif content['model'] == 'Exercise':
             items.append({
                 'label': content.get('title'),
-                'path': plugin.url_for('play_exercise',
-                    course_id=course_id, lesson_id=lesson_id,
-                    group_id=content.get('key'),
+                'path': plugin.url_for(
+                    'play_exercise', course_id=course_id,
+                    lesson_id=lesson_id, group_id=content.get('key'),
                     lecture=json.dumps(content.get('lecture_ref')),
                     quiz=json.dumps(content.get('quiz_ref')),
                     answer=json.dumps(content.get('answer_ref'))),
@@ -111,39 +110,41 @@ def open_settings():
     '/play_exercise/<course_id>/<lesson_id>/<group_id>'
     '/<lecture>/<quiz>/<answer>'))
 def play_exercise(
-    course_id, lesson_id, group_id, lecture, quiz, answer):
+        course_id, lesson_id, group_id, lecture, quiz, answer):
     lecture_data = json.loads(lecture)
     quiz_data = json.loads(quiz)
     answer_data = json.loads(answer)
-    print answer_data
     items = []
     if lecture_data:
         items.append({
             'label': 'Lecture',
-            'path': plugin.url_for('play_video',
-                course_id=course_id, lesson_id=lesson_id,
-                asset_id=lecture_data.get('key'),
-                youtube_id=lecture_data['data']['_video'].get('youtube_id')),
+            'path': plugin.url_for(
+                'play_video', course_id=course_id,
+                lesson_id=lesson_id, asset_id=lecture_data.get('key'),
+                youtube_id=lecture_data['data']['_video'].get(
+                    'youtube_id')),
             'is_playable': True
         })
     if quiz_data:
         items.append({
             'label': 'Quiz',
-            'path': plugin.url_for('load_quiz',
-                course_id=course_id, lesson_id=lesson_id,
+            'path': plugin.url_for(
+                'load_quiz', course_id=course_id, lesson_id=lesson_id,
                 group_id=group_id, quiz=quiz),
         })
     if answer_data:
         items.append({
             'label': 'Answer',
-            'path': plugin.url_for('play_video',
-                course_id=course_id, lesson_id=lesson_id,
-                asset_id=answer_data.get('key'),
-                youtube_id=answer_data['data']['_video'].get('youtube_id')),
+            'path': plugin.url_for(
+                'play_video', course_id=course_id,
+                lesson_id=lesson_id, asset_id=answer_data.get('key'),
+                youtube_id=answer_data['data']['_video'].get(
+                    'youtube_id')),
             'is_playable': True
         })
 
     return items
+
 
 @plugin.route('/load_quiz/<course_id>/<lesson_id>/<group_id>/<quiz>')
 def load_quiz(course_id, lesson_id, group_id, quiz):
@@ -154,9 +155,11 @@ def load_quiz(course_id, lesson_id, group_id, quiz):
         plugin.get_setting('user_password'))
     udacity = Udacity(auth)
     new = controls.FormQuiz()
-    new.build(course_id, lesson_id, group_id, quiz_data['key'], quiz_data, udacity)
+    new.build(
+        course_id, lesson_id, group_id, quiz_data['key'], quiz_data, udacity)
     new.doModal()
     del new
+
 
 @plugin.route('/lectures/<course_id>/<lesson_id>/<asset_id>/<youtube_id>')
 def play_video(course_id, lesson_id, asset_id, youtube_id):

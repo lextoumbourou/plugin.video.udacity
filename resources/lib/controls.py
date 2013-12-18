@@ -29,7 +29,8 @@ class FormQuiz(xbmcgui.WindowDialog):
         self.button_height = 50
         self.button_text_colour = '0xFFFFFFFF'
 
-    def build(self, course_id, lesson_id, group_id, quiz_id, quiz_data, udacity):
+    def build(
+            self, course_id, lesson_id, group_id, quiz_id, quiz_data, udacity):
         self.udacity = udacity
         self.data = quiz_data['data']
         print self.data
