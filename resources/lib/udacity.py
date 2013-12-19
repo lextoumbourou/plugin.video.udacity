@@ -18,7 +18,7 @@ class Udacity(object):
 
     def update_activity(
             self, course_id, lesson_id, group_id, asset_id, activity_type):
-        occurence_time = dt.datetime.utcnow().isoformat()
+        occurence_time = dt.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
         data = {'items': [
             {'occurrence_time': occurence_time, 'content_context': [
@@ -31,8 +31,14 @@ class Udacity(object):
 
         r = requests.post(
             '{0}/api/activity'.format(UDACITY_URL),
-            data=json.dumps(data), headers=self.auth.get_request_headers())
-        print r.status_code
+            data=json.dumps(data), headers=self.auth.get_request_headers(),
+            cookies=self.auth.get_cookies())
+
+        if not r.status_code == 200:
+            self.error = r.text
+            return False
+
+        return True
 
     def get_my_courses(self):
         results = []

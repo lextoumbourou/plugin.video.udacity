@@ -54,8 +54,14 @@ def open_course(course_id):
 @plugin.route('/open_lesson/<course_id>/<lesson_id>')
 def open_lesson(course_id, lesson_id):
     items = []
-    udacity = Udacity(None)
-    contents = udacity.get_lesson_contents(lesson_id)
+    auth_storage = plugin.get_storage('auth')
+    auth = UdacityAuth(auth_storage)
+    auth.authenticate(
+        plugin.get_setting('username'),
+        plugin.get_setting('user_password')
+    )
+    udacity = Udacity(auth)
+    contents = udacity.get_lesson_contents(course_id, lesson_id)
     for content in contents:
         if content['model'] == 'Video':
             items.append({
