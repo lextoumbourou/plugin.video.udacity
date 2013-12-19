@@ -5,9 +5,6 @@ import os
 MEDIA_DIR = os.path.dirname(
     os.path.dirname(__file__)) + os.sep + "media" + os.sep
 
-OFFSET_X_MULTIPLIER = 0.65
-OFFSET_Y_MULTIPLIER = 0.65
-
 
 class TextBox(xbmcgui.ControlButton):
     def getContent(self):
