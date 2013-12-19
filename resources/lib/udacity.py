@@ -77,8 +77,11 @@ class Udacity(object):
         r = requests.get(url)
         data = json.loads(r.text[5:])['references']['Node']
         steps = data[section]['steps_refs']
+        print steps
         for step in steps:
+            print step
             node = data[step['key']]
+            print node
 
             # Push the quiz and lecture data into the dictionary
             # to support XBMC's stateless nature
@@ -89,6 +92,7 @@ class Udacity(object):
                 if node['quiz_ref']:
                     quiz_key = node['quiz_ref']['key']
                     node['quiz_ref']['data'] = data[quiz_key]
+                    print data[quiz_key]
                 if node['answer_ref']:
                     answer_key = node['answer_ref']['key']
                     node['answer_ref']['data'] = data[answer_key]
@@ -156,6 +160,20 @@ class Udacity(object):
             url, data=json.dumps(answer_data),
             headers=self.auth.get_request_headers())
         return json.loads(r.text[5:])
+
+    def get_last_quiz_submission(self, quiz_id):
+        url = '{0}/api/nodes/{1}/state'.format(
+            UDACITY_URL, quiz_id)
+        r = requests.get(
+            url, headers=self.auth.get_request_headers(),
+            cookies=self.auth.get_cookies())
+
+        nodestates = json.loads(r.text[5:])
+        for nodestate in nodestates['nodestates']:
+            if 'last_submission_data' in nodestate:
+                return nodestate['last_submission_data']
+
+        return {}
 
 
 class UdacityAuth(object):

@@ -17,6 +17,9 @@ class TextBox(xbmcgui.ControlButton):
         self.setLabel(
             keyboard.getText())
 
+    def updateContent(self, content):
+        self.setLabel(content)
+
     @property
     def canUpdateLabel(self):
         return True
@@ -29,6 +32,9 @@ class RadioButton(xbmcgui.ControlRadioButton):
     @property
     def canUpdateLabel(self):
         return False
+
+    def updateContent(self, content):
+        self.setSelected(content)
 
 
 class FormQuiz(xbmcgui.WindowDialog):
@@ -47,13 +53,15 @@ class FormQuiz(xbmcgui.WindowDialog):
         self.button_text_colour = '0xFFFFFFFF'
 
     def build(
-            self, course_id, lesson_id, group_id, quiz_id, quiz_data, udacity):
+            self, course_id, lesson_id, group_id, quiz_id,
+            quiz_data, last_submission_data, udacity):
         self.udacity = udacity
         self.data = quiz_data['data']
         self.widgets = []
         self.udacity.update_activity(
             course_id, lesson_id, group_id, quiz_id, 'NodeVisit')
         bg_image_path = MEDIA_DIR + "blank.png"
+
         self.addControl(xbmcgui.ControlImage(
             0, 0, self.width, 720, bg_image_path)
         )
@@ -87,6 +95,12 @@ class FormQuiz(xbmcgui.WindowDialog):
                     height=widget_height, width=widget_width,  label='')
 
             self.addControl(obj)
+
+            if last_submission_data:
+                for part in last_submission_data['parts']:
+                    if part['marker'] == widget['marker']:
+                        obj.updateContent(part['content'])
+
             self.widgets.append({
                 'obj': obj, 'data': widget})
 

@@ -61,7 +61,7 @@ def open_lesson(course_id, lesson_id):
         plugin.get_setting('user_password')
     )
     udacity = Udacity(auth)
-    contents = udacity.get_lesson_contents(course_id, lesson_id)
+    contents = udacity.get_lesson_contents(lesson_id)
     for content in contents:
         if content['model'] == 'Video':
             items.append({
@@ -160,9 +160,11 @@ def load_quiz(course_id, lesson_id, group_id, quiz):
         plugin.get_setting('username'),
         plugin.get_setting('user_password'))
     udacity = Udacity(auth)
+    last_quiz_data = udacity.get_last_quiz_submission(quiz_data['key'])
     new = controls.FormQuiz()
     new.build(
-        course_id, lesson_id, group_id, quiz_data['key'], quiz_data, udacity)
+        course_id, lesson_id, group_id, quiz_data['key'],
+        quiz_data, last_quiz_data, udacity)
     new.doModal()
     del new
 
