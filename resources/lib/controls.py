@@ -50,7 +50,6 @@ class FormQuiz(xbmcgui.WindowDialog):
             self, course_id, lesson_id, group_id, quiz_id, quiz_data, udacity):
         self.udacity = udacity
         self.data = quiz_data['data']
-        print self.data
         self.widgets = []
         self.udacity.update_activity(
             course_id, lesson_id, group_id, quiz_id, 'NodeVisit')
