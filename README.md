@@ -1,7 +1,7 @@
 Udacity Plugin for XBMC
 ======================
 
-Watch Udacity lectures and complete quizzes (no support for Programming Quizes, at this time).
+Watch Udacity lectures and complete quizzes (no support for programming quizzes).
 
 ## Setup/Installation
 
