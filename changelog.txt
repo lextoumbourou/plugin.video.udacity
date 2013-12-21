@@ -2,3 +2,6 @@
 - Send activity updates back to Udacity
 - Support saved states of some quizzes
 - Improved look of lessons
+
+0.3
+- Display warning on Programming Quiz

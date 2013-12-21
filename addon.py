@@ -1,5 +1,5 @@
 import json
-from xbmcswift2 import Plugin
+from xbmcswift2 import Plugin, xbmcgui
 
 from resources.lib.udacity import Udacity, UdacityAuth
 from resources.lib import controls
@@ -161,12 +161,17 @@ def load_quiz(course_id, lesson_id, group_id, quiz):
         plugin.get_setting('user_password'))
     udacity = Udacity(auth)
     last_quiz_data = udacity.get_last_quiz_submission(quiz_data['key'])
-    new = controls.FormQuiz()
-    new.build(
-        course_id, lesson_id, group_id, quiz_data['key'],
-        quiz_data, last_quiz_data, udacity)
-    new.doModal()
-    del new
+    if quiz_data['data']['model'] == 'ProgrammingQuiz':
+        dialog = xbmcgui.Dialog()
+        dialog.ok(
+            'Please complete online',
+            'Currently, Programming Quizzes are not supported on XBMC')
+    else:
+        new = controls.FormQuiz()
+        new.build(
+            course_id, lesson_id, group_id, quiz_data['key'],
+            quiz_data, last_quiz_data, udacity)
+        new.doModal()
 
 
 @plugin.route('/lectures/<course_id>/<lesson_id>/<asset_id>/<youtube_id>')
