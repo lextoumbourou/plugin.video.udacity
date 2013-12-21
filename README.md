@@ -1,12 +1,16 @@
 Udacity Plugin for XBMC
 ======================
 
-Watch Udacity lectures through XBMC
+Watch Udacity lectures and complete quizzes (no support for Programming Quizes, at this time).
 
-## Status
+## Setup/Installation
 
-Pre alpha
+Coming soon
 
-## To do
+## XBMC Version
 
-* Handle large text fields like code blocks (probably just display a message pointing to online content)
+Frodo
+
+## License
+
+MIT
