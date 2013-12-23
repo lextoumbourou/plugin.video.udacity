@@ -77,11 +77,8 @@ class Udacity(object):
         r = requests.get(url)
         data = json.loads(r.text[5:])['references']['Node']
         steps = data[section]['steps_refs']
-        print steps
         for step in steps:
-            print step
             node = data[step['key']]
-            print node
 
             # Push the quiz and lecture data into the dictionary
             # to support XBMC's stateless nature
@@ -92,7 +89,6 @@ class Udacity(object):
                 if node['quiz_ref']:
                     quiz_key = node['quiz_ref']['key']
                     node['quiz_ref']['data'] = data[quiz_key]
-                    print data[quiz_key]
                 if node['answer_ref']:
                     answer_key = node['answer_ref']['key']
                     node['answer_ref']['data'] = data[answer_key]
@@ -107,10 +103,13 @@ class Udacity(object):
         soup = BeautifulSoup(r.text)
         courses = soup.find('ul', id='unfiltered-class-list').findAll('li')
         for course in courses:
+            difficulty = course.find('span', 'level-widget')['title']
+            if level and level != difficulty:
+                continue
+
             title = course.find('span', 'crs-li-title').text
             thumbnail = course.find(
                 'span', 'crs-li-thumbnails').find('img')['src']
-            difficulty = course.find('span', 'level-widget')['title']
             url = course.find('a')['href']
             course_id = url.split('/')[-1]
             output.append((title, course_id, difficulty, 'http:' + thumbnail))
@@ -230,7 +229,3 @@ class UdacityAuth(object):
             'xsrf_token': self.get_xsrf_token(),
             'content-type': 'application/json;charset=UTF-8',
         }.items())
-
-if __name__ == '__main__':
-    ud = Udacity(None)
-    print ud.get_lesson_contents('308873795')
