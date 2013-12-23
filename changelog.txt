@@ -5,3 +5,7 @@
 
 0.3
 - Display warning on Programming Quiz
+
+0.4
+- Added tests
+- Basic refactor
