@@ -7,6 +7,15 @@ MEDIA_DIR = os.path.dirname(
 
 
 class TextBox(xbmcgui.ControlButton):
+    """
+    Adds some additional methods to the ControlButton class to 
+    behave a) more like a HTML input field and b) to present a polymorphic interface
+    for all controls used on the quiz page
+    """
+    @property
+    def canUpdateLabel(self):
+        return True
+
     def getContent(self):
         return self.getLabel()
 
@@ -20,18 +29,18 @@ class TextBox(xbmcgui.ControlButton):
     def updateContent(self, content):
         self.setLabel(content)
 
-    @property
-    def canUpdateLabel(self):
-        return True
-
 
 class RadioButton(xbmcgui.ControlRadioButton):
-    def getContent(self):
-        return self.isSelected()
-
+    """
+    Adds some additional methods to the ControlRadioButton class to present
+    a polymorphic interface for all controls used on the quiz page
+    """
     @property
     def canUpdateLabel(self):
         return False
+
+    def getContent(self):
+        return self.isSelected()
 
     def updateContent(self, content):
         self.setSelected(content)
@@ -63,7 +72,7 @@ class FormQuiz(xbmcgui.WindowDialog):
         bg_image_path = MEDIA_DIR + "blank.png"
 
         self.addControl(xbmcgui.ControlImage(
-            0, 0, self.width, 720, bg_image_path)
+            0, 0, self.width, self.height, bg_image_path)
         )
         if '_background_image' in self.data:
             url = 'http:' + self.data['_background_image']['serving_url']
