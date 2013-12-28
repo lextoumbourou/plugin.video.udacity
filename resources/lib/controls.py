@@ -8,9 +8,9 @@ MEDIA_DIR = os.path.dirname(
 
 class TextBox(xbmcgui.ControlButton):
     """
-    Adds some additional methods to the ControlButton class to 
-    behave a) more like a HTML input field and b) to present a polymorphic interface
-    for all controls used on the quiz page
+    Adds some additional methods to the ControlButton class to
+    behave a) more like a HTML input field and b) to present a
+    polymorphic interface for all controls used on the quiz page
     """
     @property
     def canUpdateLabel(self):
@@ -52,11 +52,12 @@ class FormQuiz(xbmcgui.WindowDialog):
         self.width = 1280
         self.height = 720
         self.bottom_height = 70
-        self.widget_x_offset = 25
         self.widget_y_offset = 5
         self.widget_y_multiplier_offset = 70
         self.button_width = 100
         self.button_height = 50
+        self.radio_button_width = 30
+        self.radio_button_height = 30
         self.text_box_width = 100
         self.text_box_height = 50
         self.button_text_colour = '0xFFFFFFFF'
@@ -64,6 +65,7 @@ class FormQuiz(xbmcgui.WindowDialog):
     def build(
             self, course_id, lesson_id, group_id, quiz_id,
             quiz_data, last_submission_data, udacity):
+        print quiz_data
         self.udacity = udacity
         self.data = quiz_data['data']
         self.widgets = []
@@ -84,24 +86,25 @@ class FormQuiz(xbmcgui.WindowDialog):
         for widget in widgets:
             model = widget['model']
             x = int(math.ceil(
-                widget['placement']['x'] * self.width) - self.widget_x_offset)
+                widget['placement']['x'] * self.width))
             y = int(math.ceil(
                 widget['placement']['y'] *
                 (self.height - self.widget_y_multiplier_offset)) -
                 self.widget_y_offset)
-            widget_height = int(self.height * widget['placement']['height'])
-            widget_width = int(self.width * widget['placement']['width'])
 
             if model == 'TextInputWidget' or model == 'NumericInputWidget':
-                # Not sure why, but needs to be adjusted slightly
-                x = x + 20
+                widget_height = int(
+                    self.height * widget['placement']['height'])
+                widget_width = int(
+                    self.width * widget['placement']['width'])
                 obj = TextBox(
                     x=x, y=y, height=widget_height, width=widget_width,
                     label='', textColor="0xFF000000", shadowColor='0xFF000000')
             else:
                 obj = RadioButton(
                     x=x, y=y,
-                    height=widget_height, width=widget_width,  label='')
+                    height=self.radio_button_height,
+                    width=self.radio_button_width, label='')
 
             self.addControl(obj)
 
@@ -135,5 +138,5 @@ class FormQuiz(xbmcgui.WindowDialog):
             dialog.ok('Result', result['evaluation']['comment'])
         else:
             for count, widget in enumerate(self.widgets):
-                if widget['obj'].canUpdateLabel:
+                if control == widget['obj'] and widget['obj'].canUpdateLabel:
                     self.widgets[count]['obj'].updateLabel()
