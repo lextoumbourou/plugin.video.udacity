@@ -9,3 +9,7 @@
 0.4
 - Added tests
 - Basic refactor
+
+0.5
+- Radio button fixed on newer quizzes
+- Added fanart and icon
