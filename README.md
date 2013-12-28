@@ -13,9 +13,7 @@ Frodo
 
 ## Tests
 
-    ```
     > python resources/tests/test_addon.py
-    ```
 
 ## License
 
