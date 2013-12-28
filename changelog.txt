@@ -1,15 +1,18 @@
-0.2
-- Send activity updates back to Udacity
-- Support saved states of some quizzes
-- Improved look of lessons
+1.0.0
+- First public release
 
-0.3
-- Display warning on Programming Quiz
+0.5.1
+- Radio button fixed on newer quizzes
+- Added fanart and icon
 
-0.4
+0.4.1
 - Added tests
 - Basic refactor
 
-0.5
-- Radio button fixed on newer quizzes
-- Added fanart and icon
+0.3.1
+- Display warning on Programming Quiz
+
+0.2.1
+- Send activity updates back to Udacity
+- Support saved states of some quizzes
+- Improved look of lessons
