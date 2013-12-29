@@ -65,7 +65,6 @@ class FormQuiz(xbmcgui.WindowDialog):
     def build(
             self, course_id, lesson_id, group_id, quiz_id,
             quiz_data, last_submission_data, udacity):
-        print quiz_data
         self.udacity = udacity
         self.data = quiz_data['data']
         self.widgets = []
