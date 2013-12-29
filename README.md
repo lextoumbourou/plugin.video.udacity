@@ -1,7 +1,11 @@
-Udacity Plugin for XBMC
+Udacity Video Addon for XBMC
 ======================
 
-Watch Udacity lectures and complete quizzes (no support for programming quizzes).
+Complete courses from Udacity in XBMC
+
+From http://udacity.com/how-it-works:
+
+*"Udacity is the future of online higher education. (It) offer accessible, affordable, engaging classes that anyone can take, anytime."*
 
 ## Setup/Installation
 
