@@ -68,7 +68,7 @@ class FormQuiz(xbmcgui.WindowDialog):
         self.udacity.update_activity(
             course_id, lesson_id, group_id, quiz_id, 'NodeVisit')
         self.plugin = plugin
-        
+
         bg_image_path = (
             plugin.addon.getAddonInfo('path') + os.sep +
             'resources' + os.sep + 'media' + os.sep + 'blank.png')
