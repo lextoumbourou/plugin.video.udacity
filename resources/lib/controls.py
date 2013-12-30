@@ -2,9 +2,6 @@ from xbmcswift2 import xbmcgui, xbmc
 import math
 import os
 
-MEDIA_DIR = os.path.dirname(
-    os.path.dirname(__file__)) + os.sep + "media" + os.sep
-
 
 class TextBox(xbmcgui.ControlButton):
     """
@@ -64,13 +61,17 @@ class FormQuiz(xbmcgui.WindowDialog):
 
     def build(
             self, course_id, lesson_id, group_id, quiz_id,
-            quiz_data, last_submission_data, udacity):
+            quiz_data, last_submission_data, udacity, plugin):
         self.udacity = udacity
         self.data = quiz_data['data']
         self.widgets = []
         self.udacity.update_activity(
             course_id, lesson_id, group_id, quiz_id, 'NodeVisit')
-        bg_image_path = MEDIA_DIR + "blank.png"
+        self.plugin = plugin
+        
+        bg_image_path = (
+            plugin.addon.getAddonInfo('path') + os.sep +
+            'resources' + os.sep + 'media' + os.sep + 'blank.png')
 
         self.addControl(xbmcgui.ControlImage(
             0, 0, self.width, self.height, bg_image_path)

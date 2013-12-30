@@ -168,7 +168,7 @@ def load_quiz(course_id, lesson_id, group_id, quiz):
         new = controls.FormQuiz()
         new.build(
             course_id, lesson_id, group_id, quiz_data['key'],
-            quiz_data, last_quiz_data, udacity)
+            quiz_data, last_quiz_data, udacity, plugin)
         new.doModal()
 
 
