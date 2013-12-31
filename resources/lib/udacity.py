@@ -5,11 +5,6 @@ import requests
 from BeautifulSoup import BeautifulSoup
 
 UDACITY_URL = "https://www.udacity.com"
-# Temporary measure. I'll stop faking the UA when I'm done testing - promise!
-USER_AGENT = (
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5) "
-    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36")
-HEADERS = {'user-agent': USER_AGENT}
 
 
 class Udacity(object):
@@ -186,7 +181,7 @@ class UdacityAuth(object):
 
     def get_xsrf_token(self, force=False):
         if not self.auth_stored.get('xsrf_token') or force:
-            r = requests.get('{0}/'.format(UDACITY_URL), headers=HEADERS)
+            r = requests.get('{0}/'.format(UDACITY_URL))
             if r.status_code == 200:
                 self.auth_stored['xsrf_token'] = r.cookies['XSRF-TOKEN']
 
@@ -225,7 +220,7 @@ class UdacityAuth(object):
             return False
 
     def get_request_headers(self):
-        return dict(HEADERS.items() + {
+        return {
             'xsrf_token': self.get_xsrf_token(),
             'content-type': 'application/json;charset=UTF-8',
-        }.items())
+        }
