@@ -10,11 +10,11 @@ plugin = Plugin()
 @plugin.route('/')
 def index():
     items = [
-        {'label': plugin.get_string(40001),
+        {'label': plugin.get_string(30004),
          'path': plugin.url_for('course_catalog')},
-        {'label': plugin.get_string(40002),
+        {'label': plugin.get_string(30005),
          'path': plugin.url_for('my_courses')},
-        {'label': plugin.get_string(40003),
+        {'label': plugin.get_string(30006),
          'path': plugin.url_for('open_settings')}
     ]
 
@@ -121,7 +121,7 @@ def play_exercise(
     items = []
     if lecture_data:
         items.append({
-            'label': plugin.get_string(40004),
+            'label': plugin.get_string(30007),
             'path': plugin.url_for(
                 'play_video', course_id=course_id,
                 lesson_id=lesson_id, asset_id=lecture_data.get('key'),
@@ -131,14 +131,14 @@ def play_exercise(
         })
     if quiz_data:
         items.append({
-            'label': plugin.get_string(40005),
+            'label': plugin.get_string(30008),
             'path': plugin.url_for(
                 'load_quiz', course_id=course_id, lesson_id=lesson_id,
                 group_id=group_id, quiz=quiz),
         })
     if answer_data:
         items.append({
-            'label': plugin.get_string(40006),
+            'label': plugin.get_string(30009),
             'path': plugin.url_for(
                 'play_video', course_id=course_id,
                 lesson_id=lesson_id, asset_id=answer_data.get('key'),
@@ -162,8 +162,8 @@ def load_quiz(course_id, lesson_id, group_id, quiz):
     if quiz_data['data']['model'] == 'ProgrammingQuiz':
         dialog = xbmcgui.Dialog()
         dialog.ok(
-            plugin.get_string(50001),
-            plugin.get_string(50002))
+            plugin.get_string(30010),
+            plugin.get_string(30011))
     else:
         new = controls.FormQuiz()
         new.build(

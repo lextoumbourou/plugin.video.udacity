@@ -4,14 +4,12 @@
   <string id="30001">General</string>
   <string id="30002">Username</string>
   <string id="30003">Password</string>
-  <!-- Default menu strings -->
-  <string id="40001">Course Catalog</string>
-  <string id="40002">My Courses</string>
-  <string id="40003">Change plugin settings</string>
-  <string id="40004">Lecture</string>
-  <string id="40005">Quiz</string>
-  <string id="40006">Answer</string>
-  <!-- Error messages -->
-  <string id="50001">Please complete online</string>
-  <string id="50002">Programming Quizzes are not supported on XBMC</string>
+  <string id="30004">Course Catalog</string>
+  <string id="30005">My Courses</string>
+  <string id="30006">Change plugin settings</string>
+  <string id="30007">Lecture</string>
+  <string id="30008">Quiz</string>
+  <string id="30009">Answer</string>
+  <string id="30010">Please complete online</string>
+  <string id="30011">Programming Quizzes are not supported on XBMC</string>
 </strings>
