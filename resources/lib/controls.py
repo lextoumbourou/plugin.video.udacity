@@ -58,6 +58,9 @@ class FormQuiz(xbmcgui.WindowDialog):
         self.text_box_width = 100
         self.text_box_height = 50
         self.button_text_colour = '0xFFFFFFFF'
+        self.button_spacing = 130
+        self.button_y_pos = 660
+        self.button_x_pos = 1100
 
     def build(
             self, course_id, lesson_id, group_id, quiz_id,
@@ -68,7 +71,7 @@ class FormQuiz(xbmcgui.WindowDialog):
         self.udacity.update_activity(
             course_id, lesson_id, group_id, quiz_id, 'NodeVisit')
         self.plugin = plugin
-        
+
         bg_image_path = (
             plugin.addon.getAddonInfo('path') + os.sep +
             'resources' + os.sep + 'media' + os.sep + 'blank.png')
@@ -117,11 +120,12 @@ class FormQuiz(xbmcgui.WindowDialog):
                 'obj': obj, 'data': widget})
 
         self.submit_button = xbmcgui.ControlButton(
-            x=1100, y=660, width=self.button_width,
+            x=self.button_x_pos, y=self.button_y_pos, width=self.button_width,
             height=self.button_height, shadowColor='0xFF000000',
             label='Submit', font='font13', textColor=self.button_text_colour)
         self.back_button = xbmcgui.ControlButton(
-            x=970, y=660, width=self.button_width,
+            x=self.button_x_pos - self.button_spacing,
+            y=self.button_y_pos, width=self.button_width,
             height=self.button_height, label='Back',
             font='font13', textColor=self.button_text_colour)
 
