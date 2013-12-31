@@ -1,3 +1,8 @@
+1.0.2
+- Corrected string ID range
+- Removed fake user-agent
+- Refactoring of Controls class
+
 1.0.1
 - Better description and summary
 - Better icon, plus it's now 256x256
