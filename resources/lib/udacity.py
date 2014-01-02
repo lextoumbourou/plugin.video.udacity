@@ -73,7 +73,10 @@ class Udacity(object):
         data = json.loads(r.text[5:])['references']['Node']
         steps = data[section]['steps_refs']
         for step in steps:
-            node = data[step['key']]
+            try:
+                node = data[step['key']]
+            except KeyError:
+                continue
 
             # Push the quiz and lecture data into the dictionary
             # to support XBMC's stateless nature
