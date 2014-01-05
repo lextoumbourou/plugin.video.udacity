@@ -2,6 +2,8 @@ from xbmcswift2 import xbmcgui, xbmc
 import math
 import os
 
+import utils
+
 
 class TextBox(xbmcgui.ControlButton):
     """
@@ -68,9 +70,11 @@ class FormQuiz(xbmcgui.WindowDialog):
         self.udacity = udacity
         self.data = quiz_data['data']
         self.widgets = []
-        self.udacity.update_activity(
-            course_id, lesson_id, group_id, quiz_id, 'NodeVisit')
         self.plugin = plugin
+        self.course_id = course_id
+        self.lesson_id = lesson_id
+        self.group_id = group_id
+        self.quiz_id = quiz_id
 
         bg_image_path = (
             plugin.addon.getAddonInfo('path') + os.sep +
@@ -137,9 +141,20 @@ class FormQuiz(xbmcgui.WindowDialog):
             self.close()
             return
         elif control == self.submit_button:
-            result = self.udacity.submit_quiz(self.data['key'], self.widgets)
+            answer_data = utils.widgets_to_answer(self.widgets)
+            result = self.udacity.submit_quiz(self.data['key'], answer_data)
+            if self.udacity.auth.is_authenticated:
+                if not self.udacity.update_submission_activity(
+                    self.course_id, self.lesson_id, self.group_id,
+                    self.quiz_id, result['evaluation'], answer_data['submission']):
+                    # Submission wasn't updated correctly
+                    plugin.log.error(self.udacity.error)
             dialog = xbmcgui.Dialog()
             dialog.ok('Result', result['evaluation']['comment'])
+            print result
+            if result['evaluation']['passed'] is not False:
+                self.close()
+                return
         else:
             for count, widget in enumerate(self.widgets):
                 if control == widget['obj'] and widget['obj'].canUpdateLabel:

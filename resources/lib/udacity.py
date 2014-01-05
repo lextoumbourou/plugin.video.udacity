@@ -11,29 +11,45 @@ class Udacity(object):
     def __init__(self, auth):
         self.auth = auth
 
-    def update_activity(
-            self, course_id, lesson_id, group_id, asset_id, activity_type):
+    def update_submission_activity(
+        self, course_id, lesson_id, group_id, quiz_id, quiz_result, answer_data):
         occurence_time = dt.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+        """
+        Save submitted quiz data with Udacity
+        (had to reverse engineer online API to do this)
+        """
+        quiz_result['model'] = 'SubmissionEvaluation'
 
-        data = {'items': [
-            {'occurrence_time': occurence_time, 'content_context': [
-                {'tag': 'c-', 'node_key': course_id},
-                {'tag': 'l-', 'node_key': lesson_id},
-                {'tag': "e-", "node_key": group_id},
-                {'tag': "m-", "node_key": asset_id}],
-                'data': {'model': activity_type}}],
+        current_context = [
+            {'tag': 'c-', 'node_key': course_id},
+            {'tag': 'l-', 'node_key': lesson_id},
+            {'tag': "e-", "node_key": group_id},
+            {'tag': "m-", "node_key": quiz_id}
+        ]
+
+        data = {
+            'items': [
+                {'occurrence_time': occurence_time,
+                'content_context': current_context,
+                'data': answer_data},
+                {'occurrence_time': occurence_time,
+                'content_context': current_context,
+                'data': quiz_result,
+                }
+            ],
             'current_time': occurence_time}
-
+        
         r = requests.post(
             '{0}/api/activity'.format(UDACITY_URL),
             data=json.dumps(data), headers=self.auth.get_request_headers(),
             cookies=self.auth.get_cookies())
 
         if not r.status_code == 200:
-            self.error = r.text
+            self.error = json.loads(r.text[5:])['error']
             return False
 
         return True
+
 
     def get_my_courses(self):
         results = []
@@ -136,26 +152,14 @@ class Udacity(object):
 
         return output
 
-    def submit_quiz(self, quiz_id, widgets):
+    def submit_quiz(self, quiz_id, answer_data):
         url = "{0}/api/nodes/{1}/evaluation?_method=GET".format(
             UDACITY_URL, quiz_id)
-        parts = []
-        for widget in widgets:
-            parts.append(
-                {"model": "SubmissionPart",
-                 "marker": widget['data']['marker'],
-                 "content": widget['obj'].getContent()})
-
-        answer_data = {
-            "submission": {
-                "model": "Submission",
-                "operation": "GRADE",
-                "parts": parts
-            }
-        }
         r = requests.post(
             url, data=json.dumps(answer_data),
-            headers=self.auth.get_request_headers())
+            headers=self.auth.get_request_headers(),
+            cookies=self.auth.get_cookies())
+
         return json.loads(r.text[5:])
 
     def get_last_quiz_submission(self, quiz_id):
@@ -216,14 +220,16 @@ class UdacityAuth(object):
         if r.status_code == 200:
             self.is_authenticated = True
             self.auth_stored['cookies'] = r.cookies
+            self.auth_stored['xsrf_token'] = r.cookies['XSRF-TOKEN']
             return True
         else:
             result = json.loads(r.text[5:])
+            self.is_authenticated = False
             self.error = result['error']
             return False
 
     def get_request_headers(self):
         return {
-            'xsrf_token': self.get_xsrf_token(),
+            'x-xsrf-token': self.get_xsrf_token(),
             'content-type': 'application/json;charset=UTF-8',
         }
