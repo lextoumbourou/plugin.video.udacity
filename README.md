@@ -17,6 +17,7 @@ Frodo
 
 ## Tests
 
+    > pip install xbmcswift2
     > python resources/tests/test_addon.py
 
 ## License
