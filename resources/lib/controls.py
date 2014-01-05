@@ -141,6 +141,7 @@ class FormQuiz(xbmcgui.WindowDialog):
             self.close()
             return
         elif control == self.submit_button:
+            control.setLabel(self.plugin.get_string(30015))
             answer_data = utils.widgets_to_answer(self.widgets)
             result = self.udacity.submit_quiz(self.data['key'], answer_data)
             if self.udacity.auth.is_authenticated:
@@ -154,6 +155,8 @@ class FormQuiz(xbmcgui.WindowDialog):
             if result['evaluation']['passed'] is not False:
                 self.close()
                 return
+            else:
+                control.setLabel(self.plugin.get_string(30013))
         else:
             for count, widget in enumerate(self.widgets):
                 if control == widget['obj'] and widget['obj'].canUpdateLabel:
