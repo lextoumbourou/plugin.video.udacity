@@ -1,3 +1,7 @@
+1.0.4
+- Use strings.xml for buttons in quizzes
+- Display Loading... after submitting quiz
+
 1.0.3
 - Added BeautifulSoup dependancy
 - No longer fail when certain steps are missing (fixing some broken lessons)
