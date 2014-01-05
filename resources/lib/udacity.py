@@ -12,7 +12,8 @@ class Udacity(object):
         self.auth = auth
 
     def update_submission_activity(
-        self, course_id, lesson_id, group_id, quiz_id, quiz_result, answer_data):
+        self, course_id, lesson_id, group_id,
+            quiz_id, quiz_result, answer_data):
         occurence_time = dt.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
         """
         Save submitted quiz data with Udacity
@@ -28,17 +29,18 @@ class Udacity(object):
         ]
 
         data = {
-            'items': [
-                {'occurrence_time': occurence_time,
+            'items': [{
+                'occurrence_time': occurence_time,
                 'content_context': current_context,
-                'data': answer_data},
-                {'occurrence_time': occurence_time,
+                'data': answer_data
+                }, {
+                'occurrence_time': occurence_time,
                 'content_context': current_context,
                 'data': quiz_result,
                 }
             ],
             'current_time': occurence_time}
-        
+
         r = requests.post(
             '{0}/api/activity'.format(UDACITY_URL),
             data=json.dumps(data), headers=self.auth.get_request_headers(),
@@ -49,7 +51,6 @@ class Udacity(object):
             return False
 
         return True
-
 
     def get_my_courses(self):
         results = []

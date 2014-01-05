@@ -126,7 +126,9 @@ class FormQuiz(xbmcgui.WindowDialog):
         self.submit_button = xbmcgui.ControlButton(
             x=self.button_x_pos, y=self.button_y_pos, width=self.button_width,
             height=self.button_height, shadowColor='0xFF000000',
-            label=self.plugin.get_string(30013), font='font13', textColor=self.button_text_colour)
+            label=self.plugin.get_string(30013), font='font13',
+            textColor=self.button_text_colour)
+
         self.back_button = xbmcgui.ControlButton(
             x=self.button_x_pos - self.button_spacing,
             y=self.button_y_pos, width=self.button_width,
@@ -147,9 +149,10 @@ class FormQuiz(xbmcgui.WindowDialog):
             if self.udacity.auth.is_authenticated:
                 if not self.udacity.update_submission_activity(
                     self.course_id, self.lesson_id, self.group_id,
-                    self.quiz_id, result['evaluation'], answer_data['submission']):
+                        self.quiz_id, result['evaluation'],
+                        answer_data['submission']):
                     # Submission wasn't updated correctly
-                    plugin.log.error(self.udacity.error)
+                    self.plugin.log.error(self.udacity.error)
             dialog = xbmcgui.Dialog()
             dialog.ok('Result', result['evaluation']['comment'])
             if result['evaluation']['passed'] is not False:
