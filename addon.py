@@ -16,10 +16,9 @@ def index():
 
     auth_storage = plugin.get_storage('auth')
     auth = UdacityAuth(auth_storage)
-
-    username =  plugin.get_setting('username')
+    username = plugin.get_setting('username')
     password = plugin.get_setting('user_password')
-    
+
     # Default settings string displays Login unless logged in
     setting_string_id = 30012
     if username and password:
@@ -73,11 +72,8 @@ def open_lesson(course_id, lesson_id):
     items = []
     auth_storage = plugin.get_storage('auth')
     auth = UdacityAuth(auth_storage)
-    auth.authenticate(
-        plugin.get_setting('username'),
-        plugin.get_setting('user_password')
-    )
     udacity = Udacity(auth)
+
     contents = udacity.get_lesson_contents(lesson_id)
     for content in contents:
         if content['model'] == 'Video':
@@ -206,6 +202,7 @@ def play_video(course_id, lesson_id, asset_id, youtube_id):
     youtube_url = (
         "plugin://plugin.video.youtube/"
         "?action=play_video&videoid={0}").format(youtube_id)
+
     return plugin.set_resolved_url(youtube_url)
 
 if __name__ == '__main__':
