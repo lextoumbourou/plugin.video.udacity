@@ -21,7 +21,6 @@ class UnitTests(unittest.TestCase):
              'obj': mock_2},
         ]
         result = widgets_to_answer(widgets)
-        print result
         self.assertTrue('submission' in result)
         self.assertTrue(result['submission']['parts'][0]['content'])
 

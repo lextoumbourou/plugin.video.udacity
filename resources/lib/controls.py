@@ -151,7 +151,6 @@ class FormQuiz(xbmcgui.WindowDialog):
                     plugin.log.error(self.udacity.error)
             dialog = xbmcgui.Dialog()
             dialog.ok('Result', result['evaluation']['comment'])
-            print result
             if result['evaluation']['passed'] is not False:
                 self.close()
                 return
