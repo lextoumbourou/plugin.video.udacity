@@ -1,6 +1,6 @@
 def widgets_to_answer(widgets):
     """
-    Convert list of widgets objects to Udacity answer data
+    Convert list of widget objects to Udacity answer data
     """
     parts = []
     for widget in widgets:

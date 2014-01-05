@@ -14,11 +14,10 @@ class Udacity(object):
     def update_submission_activity(
         self, course_id, lesson_id, group_id,
             quiz_id, quiz_result, answer_data):
+        """
+        Send submitted quiz data to Udacity
+        """
         occurence_time = dt.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-        """
-        Save submitted quiz data with Udacity
-        (had to reverse engineer online API to do this)
-        """
         quiz_result['model'] = 'SubmissionEvaluation'
 
         current_context = [
