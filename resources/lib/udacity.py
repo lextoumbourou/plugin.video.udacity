@@ -76,7 +76,7 @@ class Udacity(object):
                 title = courses[key]['title']
                 results.append((title, key))
 
-            return results
+            return sorted(results, key=lambda x: x[0])
         else:
             return None
 
