@@ -25,6 +25,45 @@ class UnitTests(unittest.TestCase):
         self.assertTrue(result['submission']['parts'][0]['content'])
 
 
+    def test_dont_fail_when_no_image_data(self):
+        data =  {
+            'st101': {
+                'title': 'Test 1',
+                'catalog_entry': {
+                    'subtitle': 'Making Decisions Based on Data',
+                    'level': 'beginner',
+                    '_image': None,
+                    'short_summary': 'Summary!',
+                },
+                'model': 'Lesson',
+                '_available': True
+            }
+        }
+        udacity = Udacity(None)
+        results = udacity.process_courses(data)
+        # Check that the thumbnail field in the tuple is None
+        self.assertTrue(results[0][3] == None)
+
+    def test_only_include_available_courses(self):
+        data =  {
+            'st101': {
+                'title': 'Test 1',
+                'catalog_entry': {
+                    'subtitle': 'Making Decisions Based on Data',
+                    'level': 'beginner',
+                    '_image': None,
+                    'short_summary': 'Summary!',
+                },
+                'model': 'Lesson',
+                '_available': False
+            }
+        }
+        udacity = Udacity(None)
+        results = udacity.process_courses(data)
+        # Check that the thumbnail field in the tuple is None
+        self.assertTrue(len(results) == 0)
+
+
 class OfflineTest(unittest.TestCase):
     def test_return_true_when_cookies_and_token_are_set(self):
         auth = UdacityAuth(
