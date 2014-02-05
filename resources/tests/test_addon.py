@@ -24,6 +24,28 @@ class UnitTests(unittest.TestCase):
         self.assertTrue('submission' in result)
         self.assertTrue(result['submission']['parts'][0]['content'])
 
+    def test_dont_fail_when_answer_data_empty(self):
+        data = {
+            '382888632': {
+                'quiz_ref': {
+                    'ref': 'Node',
+                    'key': '381838603'
+                },
+                'answer_ref': None,
+                'lecture_ref': None,
+                'model': 'Exercise',
+            },
+            '313947755': {
+                'steps_refs': [{
+                    'key': '382888632'
+                }],
+            },
+            '381838603': {'model': 'Quiz'},
+        }
+        udacity = Udacity(None)
+        results = udacity.process_lesson_contents(data, '313947755')
+        print results
+        self.assertTrue(not results[0]['answer_ref'])
 
     def test_dont_fail_when_no_image_data(self):
         data =  {

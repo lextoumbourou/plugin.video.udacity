@@ -81,13 +81,18 @@ class Udacity(object):
             return None
 
     def get_lesson_contents(self, section):
-        results = []
         url = "{0}/api/nodes/{1}".format(UDACITY_URL, section)
         url += (
             "?depth=2&fresh=false&required_behavior=view&projection=classroom")
         r = requests.get(url)
         data = json.loads(r.text[5:])['references']['Node']
+
+        return self.process_lesson_contents(data, section)
+
+    def process_lesson_contents(self, data, section):
+        results = []
         steps = data[section]['steps_refs']
+
         for step in steps:
             try:
                 node = data[step['key']]
