@@ -42,7 +42,7 @@ def index():
 @plugin.route('/course_catalog/')
 def course_catalog():
     udacity = Udacity(None)
-    courses = udacity.get_courses(None)
+    courses = udacity.get_courses()
     items = [{
         'label': title,
         'path': plugin.url_for('open_course', course_id=course_id),

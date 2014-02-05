@@ -117,7 +117,7 @@ class Udacity(object):
         return results
 
 
-    def get_courses(self, level):
+    def get_courses(self):
         output = []
         url = "{0}/api/nodes".format(UDACITY_URL)
         url += (
