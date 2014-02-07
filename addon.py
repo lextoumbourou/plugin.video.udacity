@@ -57,6 +57,14 @@ def open_course(course_id):
     items = []
     udacity = Udacity(None)
     contents = udacity.get_course_contents(course_id)
+    if not contents:
+        dialog = xbmcgui.Dialog()
+        dialog.ok(
+            plugin.get_string(30010),
+            plugin.get_string(30016),
+        )
+        return None
+
     for title, key, model in contents:
         items.append({
             'label': title,

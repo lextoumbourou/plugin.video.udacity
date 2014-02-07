@@ -153,13 +153,20 @@ class Udacity(object):
         return courses
 
     def get_course_contents(self, course_id):
-        output = []
         url = (
             "{0}/api/nodes/{1}"
             "?depth=1&fresh=false&required_behavior=view"
             "&projection=navigation").format(UDACITY_URL, course_id)
         r = requests.get(url)
         data = json.loads(r.text[5:])
+
+        if r.status_code == 200:
+            return self.process_course_contents(data, course_id)
+
+    def process_course_contents(self, data, course_id):
+        output = []
+        print data
+
         steps = data['references']['Node'][course_id]['steps_refs']
         for step in steps:
             try:
