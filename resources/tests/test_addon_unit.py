@@ -80,7 +80,6 @@ class UnitTests(unittest.TestCase):
         }
         udacity = Udacity(None)
         results = udacity.process_courses(data)
-        # Check that the thumbnail field in the tuple is None
         self.assertTrue(len(results) == 0)
 
 if __name__ == '__main__':
