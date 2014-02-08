@@ -165,7 +165,6 @@ class Udacity(object):
 
     def process_course_contents(self, data, course_id):
         output = []
-        print data
 
         steps = data['references']['Node'][course_id]['steps_refs']
         for step in steps:

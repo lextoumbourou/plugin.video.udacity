@@ -23,11 +23,11 @@ Frodo
 
 ### Unit (offline)
 
-    > python -m unittest resources.tests.unit
+    > python -m unittest resources.tests.test_addon_unit
 
 ### Integration (online)
 
-    > python -m unittest resources.tests.integration
+    > python -m unittest resources.tests.test_addon_integration
 
 ## License
 
