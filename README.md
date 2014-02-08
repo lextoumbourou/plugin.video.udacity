@@ -21,13 +21,13 @@ Frodo
 
     > pip install xbmcswift2
 
-### Unit
+### Unit (offline)
 
-    > python resources/tests/unit.py
+    > python -m unittest resources.tests.unit
 
-### Integration
+### Integration (online)
 
-    > python resources/tests/integration.py
+    > python -m unittest resources.tests.integration
 
 ## License
 

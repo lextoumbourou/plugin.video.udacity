@@ -1,5 +1,6 @@
 1.0.6
 - Error when course unavailable via XBMC
+- Cleaned up tests
 
 1.0.5
 - Updated Course Catalog to use api instead of page scraping
