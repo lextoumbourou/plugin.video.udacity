@@ -1,11 +1,11 @@
 Udacity Video Addon for XBMC
 ======================
 
+*Complete courses from Udacity in XBMC*
+
 [![Udacity](https://raw.github.com/lextoumbourou/plugin.video.udacity/master/icon.png)](https://www.udacity.com/)
 
 [![Build Status](https://travis-ci.org/lextoumbourou/plugin.video.udacity.png?branch=master)](https://travis-ci.org/lextoumbourou/plugin.video.udacity)
-
-Complete courses from Udacity in XBMC
 
 From http://udacity.com/how-it-works:
 
