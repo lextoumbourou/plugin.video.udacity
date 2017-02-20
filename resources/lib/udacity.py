@@ -218,7 +218,7 @@ class UdacityAuth(object):
         if not self.auth_stored.get('xsrf_token') or force:
             r = requests.get('{0}/'.format(UDACITY_URL))
             if r.status_code == 200:
-                self.auth_stored['xsrf_token'] = r.cookies['XSRF-TOKEN']
+                self.auth_stored['xsrf_token'] = r.cookies.get('XSRF-TOKEN')
 
         return self.auth_stored.get('xsrf_token')
 
@@ -235,10 +235,6 @@ class UdacityAuth(object):
             self.is_authenticated = True
             return True
 
-        if not self.get_xsrf_token(force=True):
-            self.error = "Can't obtain xsrf token"
-            return False
-
         url = '{0}/api/session'.format(
             UDACITY_URL)
 
@@ -248,7 +244,7 @@ class UdacityAuth(object):
         if r.status_code == 200:
             self.is_authenticated = True
             self.auth_stored['cookies'] = r.cookies
-            self.auth_stored['xsrf_token'] = r.cookies['XSRF-TOKEN']
+            self.auth_stored['xsrf_token'] = r.cookies.get('XSRF-TOKEN')
             return True
         else:
             result = json.loads(r.text[5:])
